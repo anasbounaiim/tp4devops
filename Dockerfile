@@ -1,14 +1,21 @@
-# Utilisation de l'image Nginx
+# Use the official lightweight Nginx image
 FROM nginx:alpine
 
-# Suppression de la page d'accueil par défaut
+# Remove default Nginx welcome page
 RUN rm -rf /usr/share/nginx/html/*
 
-# Ajout de notre page index.html
-COPY index.html /usr/share/nginx/html/
+# Copy all files from project to the container
+COPY . /usr/share/nginx/html/
 
-# Exposition du port 80
+# Fix permissions (avoid permission errors)
+RUN chmod -R 755 /usr/share/nginx/html
+
+# (Optional) Use a non-root user for security
+RUN adduser -D -g 'www' www && chown -R www:www /usr/share/nginx/html
+USER www
+
+# Expose port 80
 EXPOSE 80
 
-# Commande pour démarrer Nginx
+# Start Nginx in foreground mode
 CMD ["nginx", "-g", "daemon off;"]
